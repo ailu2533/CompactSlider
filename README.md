@@ -218,10 +218,6 @@ The demo package contains several use cases.
 
 Version 1.0 is deprecated and no longer supported. You can find the documentation for version 1.0 in the file: [README v1](https://github.com/buh/CompactSlider/blob/main/README_v1.md).
 
-# Support
-
-You can buy me a coffee [here](https://www.buymeacoffee.com/bukhtin) ☕️
-
 # License
 
 `CompactSlider` is available under the [MIT license](https://github.com/buh/CompactSlider/blob/main/LICENSE)
