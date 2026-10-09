@@ -134,6 +134,7 @@ public struct CompactSlider<Value: BinaryFloatingPoint, Point: CompactSliderPoin
     @Environment(\.compactSliderCircularGridStyle) var compactSliderCircularGridStyle
     @Environment(\.compactSliderAnimations) var animations
     @Environment(\.compactSliderOnChangeAction) var onChangeAction
+    @Environment(\.compactSliderOnEndAction) var onEndAction
     #if os(macOS)
     @Environment(\.appearsActive) var appearsActive
     #endif
@@ -157,6 +158,10 @@ public struct CompactSlider<Value: BinaryFloatingPoint, Point: CompactSliderPoin
     @State var isWheelScrolling = false
     @State var startDragTime: CFAbsoluteTime?
     @State var startDragLocation: CGPoint?
+    /// Translation at the moment the slider accepts the drag.
+    /// Later samples subtract this so movement made while the gesture was
+    /// still claimed by a vertical drag is not applied in one step.
+    @State var dragTranslationOrigin: CGSize?
     @State var scrollWheelEvent = ScrollWheelEvent.zero
     
     var style: AnyCompactSliderStyle {

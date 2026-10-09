@@ -26,3 +26,23 @@ extension View {
         environment(\.compactSliderOnChangeAction, action)
     }
 }
+
+struct CompactSliderOnEndActionKey: EnvironmentKey {
+    static let defaultValue: (() -> Void)? = nil
+}
+
+extension EnvironmentValues {
+    var compactSliderOnEndAction: (() -> Void)? {
+        get { self[CompactSliderOnEndActionKey.self] }
+        set { self[CompactSliderOnEndActionKey.self] = newValue }
+    }
+}
+
+extension View {
+    /// Adds an action to perform when a drag or tap on the slider ends.
+    public func compactSliderOnEnd(
+        action: @escaping () -> Void
+    ) -> some View {
+        environment(\.compactSliderOnEndAction, action)
+    }
+}

@@ -40,6 +40,7 @@ public struct SystemSlider<Value: BinaryFloatingPoint>: View {
     let bounds: ClosedRange<Value>
     let step: Value
     let type: `Type`
+    let onEnd: () -> Void
     
     public var body: some View {
         slider
@@ -57,6 +58,7 @@ public struct SystemSlider<Value: BinaryFloatingPoint>: View {
                 SystemSliderHandleView(configuration: configuration, handleStyle: handleStyle, progress: progress)
             }
             .compactSliderSystemFrame(for: systemSliderStyle.slider.type)
+            .compactSliderOnEnd(action: onEnd)
     }
     
     private var slider: some View {
@@ -83,7 +85,8 @@ extension SystemSlider {
     public init(
         value: Binding<Value>,
         in bounds: ClosedRange<Value> = 0...1,
-        step: Value = 0
+        step: Value = 0,
+        onEnd: @escaping () -> Void = {}
     ) {
         _lowerValue = value
         _upperValue = .constant(0)
@@ -91,6 +94,7 @@ extension SystemSlider {
         self.bounds = bounds
         self.step = step
         type = .singleValue
+        self.onEnd = onEnd
     }
     
     /// Creates a "system" slider with multiple values. The values are bound to the given values.
@@ -101,7 +105,8 @@ extension SystemSlider {
     public init(
         values: Binding<[Value]>,
         in bounds: ClosedRange<Value> = 0...1,
-        step: Value = 0
+        step: Value = 0,
+        onEnd: @escaping () -> Void = {}
     ) {
         _lowerValue = .constant(0)
         _upperValue = .constant(0)
@@ -109,6 +114,7 @@ extension SystemSlider {
         self.bounds = bounds
         self.step = step
         type = .multipleValues
+        self.onEnd = onEnd
     }
     
     /// Creates a "system" slider with a range of values. The values are bound to the given values.
@@ -121,7 +127,8 @@ extension SystemSlider {
         from lowerValue: Binding<Value>,
         to upperValue: Binding<Value>,
         in bounds: ClosedRange<Value> = 0...1,
-        step: Value = 0
+        step: Value = 0,
+        onEnd: @escaping () -> Void = {}
     ) {
         _lowerValue = lowerValue
         _upperValue = upperValue
@@ -129,6 +136,7 @@ extension SystemSlider {
         self.bounds = bounds
         self.step = step
         type = .rangeValues
+        self.onEnd = onEnd
     }
 }
 

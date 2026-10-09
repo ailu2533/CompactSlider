@@ -7,11 +7,10 @@ import SwiftUI
 
 extension CompactSlider {
     func dragGestureOnChange(_ value: DragGesture.Value, size: CGSize) {
-        if style.type.isHorizontal, abs(value.translation.width) < abs(value.translation.height) {
-            return
-        }
-        
-        if style.type.isVertical, abs(value.translation.height) < abs(value.translation.width) {
+        // The axis check only decides whether this gesture belongs to the slider.
+        // Once accepted, later samples keep tracking. Dropping them and then adding
+        // DragGesture's cumulative translation makes the value jump.
+        if dragTranslationOrigin == nil, dragAxisBlocksSlider(value.translation) {
             return
         }
         
@@ -36,10 +35,11 @@ extension CompactSlider {
                 type: style.type,
                 isRightToLeft: layoutDirection == .rightToLeft
             )
+            dragTranslationOrigin = value.translation
         }
         
         dragGestureUpdateProgress(
-            translation: value.translation,
+            translation: dragTranslation(from: value.translation),
             size: size,
             type: style.type,
             isEnded: false,
@@ -51,9 +51,11 @@ extension CompactSlider {
         defer {
             startDragTime = nil
             startDragLocation = nil
+            dragTranslationOrigin = nil
         }
         
         guard startDragLocation != nil else { return }
+        defer { onEndAction?() }
         
         if isTap() {
             if let animation = animations[.tapping] {
@@ -70,7 +72,7 @@ extension CompactSlider {
         
         if step != nil, !options.contains(.snapToSteps) {
             dragGestureUpdateProgress(
-                translation: value.translation,
+                translation: dragTranslation(from: value.translation),
                 size: size,
                 type: style.type,
                 isEnded: true,
@@ -87,6 +89,29 @@ extension CompactSlider {
                 isDragging = false
             }
         }
+    }
+    
+    func dragAxisBlocksSlider(_ translation: CGSize) -> Bool {
+        if style.type.isHorizontal, abs(translation.width) < abs(translation.height) {
+            return true
+        }
+        
+        if style.type.isVertical, abs(translation.height) < abs(translation.width) {
+            return true
+        }
+        
+        return false
+    }
+    
+    func dragTranslation(from translation: CGSize) -> CGSize {
+        guard let dragTranslationOrigin else {
+            return translation
+        }
+        
+        return CGSize(
+            width: translation.width - dragTranslationOrigin.width,
+            height: translation.height - dragTranslationOrigin.height
+        )
     }
     
     func dragGestureUpdateProgress(
